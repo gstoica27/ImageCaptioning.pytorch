@@ -93,7 +93,7 @@ class DataLoaderRaw():
         max_index = self.N
         wrapped = False
         infos = []
-
+        print('Batch Size: {}'.format(batch_size))
         for i in range(batch_size):
             ri = self.iterator
             ri_next = ri + 1
