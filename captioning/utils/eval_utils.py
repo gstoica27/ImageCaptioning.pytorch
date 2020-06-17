@@ -149,6 +149,7 @@ def eval_split(model, crit, loader, eval_kwargs={}):
     loss_evals = 1e-8
     predictions = []
     n_predictions = [] # when sample_n > 1
+    while_count = 0
     while True:
         data = loader.get_batch(split)
         n = n + len(data['infos'])
@@ -185,7 +186,8 @@ def eval_split(model, crit, loader, eval_kwargs={}):
                 print('\n'.join([utils.decode_sequence(loader.get_vocab(), _['seq'].unsqueeze(0))[0] for _ in model.done_beams[i]]))
                 print('--' * 10)
         sents = utils.decode_sequence(loader.get_vocab(), seq)
-
+        while_count += 1
+        print('While step: {} | Num Sent: {}'.format(while_count, len(sents)))
         for k, sent in enumerate(sents):
             entry = {'image_id': data['infos'][k]['id'], 'caption': sent, 'perplexity': perplexity[k].item(), 'entropy': entropy[k].item()}
             if eval_kwargs.get('dump_path', 0) == 1:
@@ -223,7 +225,7 @@ def eval_split(model, crit, loader, eval_kwargs={}):
         n_predictions = sorted(n_predictions, key=lambda x: x['perplexity'])
     if not os.path.isdir('eval_results'):
         os.mkdir('eval_results')
-    torch.save((predictions, n_predictions), os.path.join('eval_results/', '.saved_pred_'+ eval_kwargs['id'] + '_' + split + '.pth'))
+    # torch.save((predictions, n_predictions), os.path.join('eval_results/', '.saved_pred_'+ eval_kwargs['id'] + '_' + split + '.pth'))
     if lang_eval == 1:
         lang_stats = language_eval(dataset, predictions, n_predictions, eval_kwargs, split)
 
