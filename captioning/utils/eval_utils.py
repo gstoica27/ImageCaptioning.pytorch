@@ -153,7 +153,6 @@ def eval_split(model, crit, loader, eval_kwargs={}):
     while True:
         data = loader.get_batch(split)
         n = n + len(data['infos'])
-        print('info len: {}'.format(len(data['infos'])))
         if data.get('labels', None) is not None and verbose_loss:
             # forward the model to get loss
             tmp = [data['fc_feats'], data['att_feats'], data['labels'], data['masks'], data['att_masks']]
@@ -187,8 +186,7 @@ def eval_split(model, crit, loader, eval_kwargs={}):
                 print('--' * 10)
         sents = utils.decode_sequence(loader.get_vocab(), seq)
         while_count += 1
-        print('While step: {} | Num Sent: {} | Seq shape: {} | Logprobs: {}'.format(
-            while_count, len(sents), seq.shape, seq_logprobs.shape))
+
         for k, sent in enumerate(sents):
             entry = {'image_id': data['infos'][k]['id'], 'caption': sent, 'perplexity': perplexity[k].item(), 'entropy': entropy[k].item()}
             if eval_kwargs.get('dump_path', 0) == 1:
