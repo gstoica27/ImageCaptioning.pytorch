@@ -29,6 +29,7 @@ class DataLoaderRaw():
         self.folder_path = opt.get('folder_path', '')
 
         self.batch_size = opt.get('batch_size', 1)
+        print('Init Data Loader. Batchsize: {}'.format(self.batch_size))
         self.seq_per_img = 1
 
         # Load resnet
