@@ -39,7 +39,7 @@ opt = parser.parse_args()
 # Load infos
 with open(opt.infos_path, 'rb') as f:
     infos = utils.pickle_load(f)
-
+print('Infos: {}'.format(infos))
 # override and collect parameters
 replace = ['input_fc_dir', 'input_att_dir', 'input_box_dir', 'input_label_h5', 'input_json', 'batch_size', 'id']
 ignore = ['start_from']
