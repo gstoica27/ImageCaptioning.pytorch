@@ -76,8 +76,8 @@ def language_eval(dataset, preds, preds_n, eval_kwargs, split):
 
     # filter results to only those in MSCOCO validation set
     preds_filt = [p for p in preds if p['image_id'] in valids]
-    mean_perplexity = sum([_['perplexity'] for _ in preds_filt]) / len(preds_filt)
-    mean_entropy = sum([_['entropy'] for _ in preds_filt]) / len(preds_filt)
+    mean_perplexity = sum([_['perplexity'] for _ in preds_filt]) / max(len(preds_filt), 1)
+    mean_entropy = sum([_['entropy'] for _ in preds_filt]) / max(len(preds_filt), 1)
     print('using %d/%d predictions' % (len(preds_filt), len(preds)))
     json.dump(preds_filt, open(cache_path, 'w')) # serialize to temporary json file. Sigh, COCO API...
 

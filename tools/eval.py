@@ -57,6 +57,7 @@ pred_fn = os.path.join('eval_results/', '.saved_pred_'+ opt.id + '_' + opt.split
 result_fn = os.path.join('eval_results/', opt.id + '_' + opt.split + '.json')
 
 if opt.only_lang_eval == 1 or (not opt.force and os.path.isfile(pred_fn)): 
+    print('pred fn path: {} | Exists: {}'.format(pred_fn, os.path.isfile(pred_fn)))
     # if results existed, then skip, unless force is on
     if not opt.force:
         try:
