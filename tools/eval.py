@@ -119,6 +119,7 @@ loss, split_predictions, lang_stats = eval_utils.eval_split(model, crit, loader,
         vars(opt))
 
 print('loss: ', loss)
+print('Split predictions: {}'.format(split_predictions))
 if lang_stats:
     print(lang_stats)
 
