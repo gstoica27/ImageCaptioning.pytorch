@@ -85,7 +85,7 @@ class DataLoaderRaw():
         self.dataset = self  # to fix the bug in eval
 
     def get_batch(self, split, batch_size=None):
-        batch_size = batch_size or self.batch_size
+        batch_size = min(batch_size or self.batch_size, self.N)
 
         # pick an index of the datapoint to load next
         fc_batch = np.ndarray((batch_size, 2048), dtype = 'float32')
