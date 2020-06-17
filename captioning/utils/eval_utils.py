@@ -153,7 +153,7 @@ def eval_split(model, crit, loader, eval_kwargs={}):
     while True:
         data = loader.get_batch(split)
         n = n + len(data['infos'])
-
+        print('info len: {}'.format(len(data['infos'])))
         if data.get('labels', None) is not None and verbose_loss:
             # forward the model to get loss
             tmp = [data['fc_feats'], data['att_feats'], data['labels'], data['masks'], data['att_masks']]
