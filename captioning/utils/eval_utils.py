@@ -187,7 +187,8 @@ def eval_split(model, crit, loader, eval_kwargs={}):
                 print('--' * 10)
         sents = utils.decode_sequence(loader.get_vocab(), seq)
         while_count += 1
-        print('While step: {} | Num Sent: {} | Seq shape: {}'.format(while_count, len(sents), seq.shape))
+        print('While step: {} | Num Sent: {} | Seq shape: {} | Logprobs: {}'.format(
+            while_count, len(sents), seq.shape, seq_logprobs.shape))
         for k, sent in enumerate(sents):
             entry = {'image_id': data['infos'][k]['id'], 'caption': sent, 'perplexity': perplexity[k].item(), 'entropy': entropy[k].item()}
             if eval_kwargs.get('dump_path', 0) == 1:
