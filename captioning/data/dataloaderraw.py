@@ -100,8 +100,8 @@ class DataLoaderRaw():
         # print('Batch Size: {}'.format(batch_size))
         # Ensure frame2data index always passes. Don't fail on missing frames.
         print('Batch Size for Frame {} is: {}'.format(frame_num, batch_size))
-        img = Image.open(frame_data['path'])
-
+        # img = Image.open(frame_data['path'])
+        img = skimage.io.imread(frame_data['path'])
         for i in range(batch_size):
             # ri = self.iterator
             # ri_next = ri + 1
@@ -114,11 +114,12 @@ class DataLoaderRaw():
             # self.iterator = ri_next
 
             # img = skimage.io.imread(self.files[ri])
-            # img = skimage.io.imread(frame_data['path'])
-            roi_bbox = frame_data['rois'][i]
-            cropped_img = deepcopy(img).crop(
-                (roi_bbox[0], roi_bbox[1], roi_bbox[2]+1, roi_bbox[3]+1)
-            )
+
+            roi_bbox = frame_data['rois'][i].astype(np.int)
+            cropped_img = img[roi_bbox[1]:roi_bbox[3]+1, roi_bbox[0]:roi_bbox[2]+1, :]
+            # cropped_img = deepcopy(img).crop(
+            #     (roi_bbox[0], roi_bbox[1], roi_bbox[2]+1, roi_bbox[3]+1)
+            # )
 
             if len(cropped_img.shape) == 2:
                 cropped_img = cropped_img[:,:,np.newaxis]
