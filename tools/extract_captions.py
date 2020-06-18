@@ -97,6 +97,10 @@ print('Split predictions: {}'.format(split_predictions))
 if lang_stats:
     print(lang_stats)
 
+print('Saving frame2data')
+save_path = os.path.join(opt.image_folder, 'frame2data_captions.pkl')
+pickle.dump(loader.frame2data, open(save_path, 'wb'))
+
 if opt.dump_json == 1:
     # dump the json
     json.dump(split_predictions, open('vis/vis.json', 'w'))
