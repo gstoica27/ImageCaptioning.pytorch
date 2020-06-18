@@ -13,6 +13,10 @@ import skimage.io
 import scipy.misc
 
 from torchvision import transforms as trn
+import pickle
+from copy import deepcopy
+from PIL import Image
+
 preprocess = trn.Compose([
         #trn.ToTensor(),
         trn.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
@@ -48,36 +52,31 @@ class DataLoaderRaw():
         self.ids = []
 
         print(len(self.coco_json))
-        if len(self.coco_json) > 0:
-            print('reading from ' + opt.coco_json)
-            # read in filenames from the coco-style json file
-            self.coco_annotation = json.load(open(self.coco_json))
-            for k,v in enumerate(self.coco_annotation['images']):
-                fullpath = os.path.join(self.folder_path, v['file_name'])
-                self.files.append(fullpath)
-                self.ids.append(v['id'])
-        else:
-            # read in all the filenames from the folder
-            print('listing all images in directory ' + self.folder_path)
-            def isImage(f):
-                supportedExt = ['.jpg','.JPG','.jpeg','.JPEG','.png','.PNG','.ppm','.PPM']
-                for ext in supportedExt:
-                    start_idx = f.rfind(ext)
-                    if start_idx >= 0 and start_idx + len(ext) == len(f):
-                        return True
-                return False
 
-            n = 1
-            for root, dirs, files in os.walk(self.folder_path, topdown=False):
-                for file in files:
-                    fullpath = os.path.join(self.folder_path, file)
-                    if isImage(fullpath):
-                        self.files.append(fullpath)
-                        self.ids.append(str(n)) # just order them sequentially
-                        n = n + 1
+        # read in all the filenames from the folder
+        print('listing all images in directory ' + self.folder_path)
+        def isImage(f):
+            supportedExt = ['.jpg','.JPG','.jpeg','.JPEG','.png','.PNG','.ppm','.PPM']
+            for ext in supportedExt:
+                start_idx = f.rfind(ext)
+                if start_idx >= 0 and start_idx + len(ext) == len(f):
+                    return True
+            return False
 
-        self.N = len(self.files)
-        print('DataLoaderRaw found ', self.N, ' images')
+        # n = 1
+        # for root, dirs, files in os.walk(self.folder_path, topdown=False):
+        #     for file in files:
+        #         fullpath = os.path.join(self.folder_path, file)
+        #         if isImage(fullpath):
+        #             self.files.append(fullpath)
+        #             self.ids.append(str(n)) # just order them sequentially
+        #             n = n + 1
+        # self.N = len(self.files)
+
+        frame2data_path = os.path.join(self.folder_path, 'frame2data.pkl')
+        self.frame2data = pickle.load(open(frame2data_path, 'rb'))
+        self.N = len(self.frame2data)
+        print('DataLoaderRaw found ', self.N, ' frames')
 
         self.iterator = 0
 
@@ -85,7 +84,7 @@ class DataLoaderRaw():
         self.dataset = self  # to fix the bug in eval
 
     def get_batch(self, split, batch_size=None):
-        batch_size = min(batch_size or self.batch_size, self.N)
+        # batch_size = min(batch_size or self.batch_size, self.N)
 
         # pick an index of the datapoint to load next
         fc_batch = np.ndarray((batch_size, 2048), dtype = 'float32')
@@ -94,33 +93,51 @@ class DataLoaderRaw():
         wrapped = False
         infos = []
         # print('Batch Size: {}'.format(batch_size))
+        # Ensure frame2data index always passes. Don't fail on missing frames.
+        while str(self.iterator) not in self.frame2data:
+            self.iterator += 1
+        frame_num = str(self.iterator)
+        # {path: frame_path, rois: [roi_1, ..., roi_n], ...}
+        frame_data = self.frame2data[frame_num]
+        batch_size = len(frame_data['rois'])
+        print('Batch Size for Frame {} is: {}'.format(frame_num, batch_size))
+        img = Image.open(frame_data['path'])
+
         for i in range(batch_size):
-            ri = self.iterator
-            ri_next = ri + 1
-            if ri_next >= max_index:
-                ri_next = 0
-                wrapped = True
+            # ri = self.iterator
+            # ri_next = ri + 1
+            # if ri_next >= max_index:
+                # Reached End of File, Break
+                # break
+                # ri_next = 0
+                # wrapped = True
                 # wrap back around
-            self.iterator = ri_next
+            # self.iterator = ri_next
 
-            img = skimage.io.imread(self.files[ri])
+            # img = skimage.io.imread(self.files[ri])
+            # img = skimage.io.imread(frame_data['path'])
+            roi_bbox = frame_data['rois'][i]
+            cropped_img = deepcopy(img).crop(
+                (roi_bbox[0], roi_bbox[1], roi_bbox[2]+1, roi_bbox[3]+1)
+            )
 
-            if len(img.shape) == 2:
-                img = img[:,:,np.newaxis]
-                img = np.concatenate((img, img, img), axis=2)
+            if len(cropped_img.shape) == 2:
+                cropped_img = cropped_img[:,:,np.newaxis]
+                cropped_img = np.concatenate((cropped_img, cropped_img, cropped_img), axis=2)
 
-            img = img[:,:,:3].astype('float32')/255.0
-            img = torch.from_numpy(img.transpose([2,0,1])).cuda()
-            img = preprocess(img)
+            cropped_img = cropped_img[:,:,:3].astype('float32')/255.0
+            cropped_img = torch.from_numpy(cropped_img.transpose([2,0,1])).cuda()
+            cropped_img = preprocess(cropped_img)
             with torch.no_grad():
-                tmp_fc, tmp_att = self.my_resnet(img)
+                tmp_fc, tmp_att = self.my_resnet(cropped_img)
 
             fc_batch[i] = tmp_fc.data.cpu().float().numpy()
             att_batch[i] = tmp_att.data.cpu().float().numpy()
 
             info_struct = {}
-            info_struct['id'] = self.ids[ri]
-            info_struct['file_path'] = self.files[ri]
+            info_struct['id'] = self.ids[i]
+            info_struct['file_path'] = os.path.join(os.path.dirname(frame_data['path']),
+                                                    '{}_{}.jpg'.format(frame_num, i))
             infos.append(info_struct)
 
         data = {}

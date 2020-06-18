@@ -150,7 +150,7 @@ def eval_split(model, crit, loader, eval_kwargs={}):
     predictions = []
     n_predictions = [] # when sample_n > 1
     while_count = 0
-    while True:
+    while loader.iterator < loader.N:
         data = loader.get_batch(split)
         n = n + len(data['infos'])
         if data.get('labels', None) is not None and verbose_loss:
@@ -186,18 +186,19 @@ def eval_split(model, crit, loader, eval_kwargs={}):
                 print('--' * 10)
         sents = utils.decode_sequence(loader.get_vocab(), seq)
         while_count += 1
-
+        frame_data = loader.frame2data[str(loader.iterator)]
+        frame_data['captions'] = [''] * len(frame_data['rois'])
         for k, sent in enumerate(sents):
             entry = {'image_id': data['infos'][k]['id'], 'caption': sent, 'perplexity': perplexity[k].item(), 'entropy': entropy[k].item()}
-            if eval_kwargs.get('dump_path', 0) == 1:
-                entry['file_name'] = data['infos'][k]['file_path']
+            # if eval_kwargs.get('dump_path', 0) == 1:
+            #     entry['file_name'] = data['infos'][k]['file_path']
             predictions.append(entry)
-            if eval_kwargs.get('dump_images', 0) == 1:
-                # dump the raw image to vis/ folder
-                cmd = 'cp "' + os.path.join(eval_kwargs['image_root'], data['infos'][k]['file_path']) + '" vis/imgs/img' + str(len(predictions)) + '.jpg' # bit gross
-                print(cmd)
-                os.system(cmd)
-
+            # if eval_kwargs.get('dump_images', 0) == 1:
+            #     # dump the raw image to vis/ folder
+            #     cmd = 'cp "' + os.path.join(eval_kwargs['image_root'], data['infos'][k]['file_path']) + '" vis/imgs/img' + str(len(predictions)) + '.jpg' # bit gross
+            #     print(cmd)
+            #     os.system(cmd)
+            frame_data['captions'][data['infos'][k]['id']] = sent
             if verbose:
                 print('image %s: %s' %(entry['image_id'], entry['caption']))
 
@@ -216,8 +217,9 @@ def eval_split(model, crit, loader, eval_kwargs={}):
         if verbose:
             print('evaluating validation preformance... %d/%d (%f)' %(n, ix1, loss))
 
-        if num_images >= 0 and n >= num_images:
-            break
+        # if num_images >= 0 and n >= num_images:
+        #     break
+        loader.iterator += 1
 
     lang_stats = None
     if len(n_predictions) > 0 and 'perplexity' in n_predictions[0]:
