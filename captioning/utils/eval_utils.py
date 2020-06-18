@@ -221,7 +221,7 @@ def eval_split(model, crit, loader, eval_kwargs={}):
         # if num_images >= 0 and n >= num_images:
         #     break
         loader.iterator += 1
-
+    print('Loader: {}'.format(loader.iterator))
     lang_stats = None
     if len(n_predictions) > 0 and 'perplexity' in n_predictions[0]:
         n_predictions = sorted(n_predictions, key=lambda x: x['perplexity'])
