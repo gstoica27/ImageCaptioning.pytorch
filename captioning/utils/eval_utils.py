@@ -208,12 +208,12 @@ def eval_split(model, crit, loader, eval_kwargs={}):
         
         # ix0 = data['bounds']['it_pos_now']
         ix1 = data['bounds']['it_max']
-        if num_images != -1:
-            ix1 = min(ix1, num_images)
-        else:
-            num_images = ix1
-        for i in range(n - ix1):
-            predictions.pop()
+        # if num_images != -1:
+        #     ix1 = min(ix1, num_images)
+        # else:
+        #     num_images = ix1
+        # for i in range(n - ix1):
+        #     predictions.pop()
 
         if verbose:
             print('evaluating validation performance... %d/%d (%f)' %(n, ix1, loss))
