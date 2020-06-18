@@ -85,7 +85,12 @@ class DataLoaderRaw():
 
     def get_batch(self, split, batch_size=None):
         # batch_size = min(batch_size or self.batch_size, self.N)
-
+        while str(self.iterator) not in self.frame2data:
+            self.iterator += 1
+        frame_num = str(self.iterator)
+        # {path: frame_path, rois: [roi_1, ..., roi_n], ...}
+        frame_data = self.frame2data[frame_num]
+        batch_size = len(frame_data['rois'])
         # pick an index of the datapoint to load next
         fc_batch = np.ndarray((batch_size, 2048), dtype = 'float32')
         att_batch = np.ndarray((batch_size, 14, 14, 2048), dtype = 'float32')
@@ -94,12 +99,6 @@ class DataLoaderRaw():
         infos = []
         # print('Batch Size: {}'.format(batch_size))
         # Ensure frame2data index always passes. Don't fail on missing frames.
-        while str(self.iterator) not in self.frame2data:
-            self.iterator += 1
-        frame_num = str(self.iterator)
-        # {path: frame_path, rois: [roi_1, ..., roi_n], ...}
-        frame_data = self.frame2data[frame_num]
-        batch_size = len(frame_data['rois'])
         print('Batch Size for Frame {} is: {}'.format(frame_num, batch_size))
         img = Image.open(frame_data['path'])
 
