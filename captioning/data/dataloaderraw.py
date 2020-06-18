@@ -75,7 +75,7 @@ class DataLoaderRaw():
 
         frame2data_path = os.path.join(self.folder_path, 'frame2data.pkl')
         self.frame2data = pickle.load(open(frame2data_path, 'rb'))
-        self.N = len(self.frame2data)
+        self.N = int(max(self.frame2data))
         print('DataLoaderRaw found ', self.N, ' frames')
 
         self.iterator = 0
