@@ -135,7 +135,7 @@ class DataLoaderRaw():
             att_batch[i] = tmp_att.data.cpu().float().numpy()
 
             info_struct = {}
-            info_struct['id'] = self.ids[i]
+            info_struct['id'] = i
             info_struct['file_path'] = os.path.join(os.path.dirname(frame_data['path']),
                                                     '{}_{}.jpg'.format(frame_num, i))
             infos.append(info_struct)
