@@ -150,6 +150,7 @@ def eval_split(model, crit, loader, eval_kwargs={}):
     predictions = []
     n_predictions = [] # when sample_n > 1
     while_count = 0
+    print('Total Frames: {}'.format(loader.N))
     while loader.iterator < loader.N:
         data = loader.get_batch(split)
         n = n + len(data['infos'])
@@ -215,7 +216,7 @@ def eval_split(model, crit, loader, eval_kwargs={}):
             predictions.pop()
 
         if verbose:
-            print('evaluating validation preformance... %d/%d (%f)' %(n, ix1, loss))
+            print('evaluating validation performance... %d/%d (%f)' %(n, ix1, loss))
 
         # if num_images >= 0 and n >= num_images:
         #     break
