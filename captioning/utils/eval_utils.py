@@ -206,7 +206,7 @@ def eval_split(model, crit, loader, eval_kwargs={}):
 
         if sample_n > 1:
             eval_split_n(model, n_predictions, loader, [fc_feats, att_feats, att_masks, data], eval_kwargs)
-        print(loader.frame2data[str(loader.iterator)])
+        # print(loader.frame2data[str(loader.iterator)])
         # ix0 = data['bounds']['it_pos_now']
         ix1 = data['bounds']['it_max']
         # if num_images != -1:
@@ -231,7 +231,7 @@ def eval_split(model, crit, loader, eval_kwargs={}):
     # torch.save((predictions, n_predictions), os.path.join('eval_results/', '.saved_pred_'+ eval_kwargs['id'] + '_' + split + '.pth'))
     if lang_eval == 1:
         lang_stats = language_eval(dataset, predictions, n_predictions, eval_kwargs, split)
-
+    print(loader.frame2data)
     # Switch back to training mode
     model.train()
     return loss_sum/loss_evals, predictions, lang_stats
