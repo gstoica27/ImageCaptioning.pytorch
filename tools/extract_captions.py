@@ -98,6 +98,7 @@ if lang_stats:
     print(lang_stats)
 
 save_path = os.path.join(opt.image_folder, 'frame2data_captions.pkl')
+print(loader.frame2data)
 print('Saving frame2data: {}'.format(save_path))
 pickle.dump(loader.frame2data, open(save_path, 'wb'))
 
