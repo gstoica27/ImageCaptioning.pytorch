@@ -231,7 +231,7 @@ def eval_split(model, crit, loader, eval_kwargs={}):
     # torch.save((predictions, n_predictions), os.path.join('eval_results/', '.saved_pred_'+ eval_kwargs['id'] + '_' + split + '.pth'))
     if lang_eval == 1:
         lang_stats = language_eval(dataset, predictions, n_predictions, eval_kwargs, split)
-    print(loader.frame2data)
+
     # Switch back to training mode
     model.train()
     return loss_sum/loss_evals, predictions, lang_stats

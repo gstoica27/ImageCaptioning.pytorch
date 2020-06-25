@@ -87,7 +87,7 @@ loader.dataset.ix_to_word = infos['vocab']
 opt.dataset = opt.input_json
 loss, split_predictions, lang_stats = eval_utils.eval_split(model, crit, loader,
         vars(opt))
-
+print('New data: {}'.format(loader.frame2data))
 if opt.all_captions_save_path != '':
     print('Saving all captions to {}'.format(opt.all_captions_save_path))
     pickle.dump(split_predictions, open(opt.all_captions_save_path, 'wb'))
