@@ -206,7 +206,7 @@ def eval_split(model, crit, loader, eval_kwargs={}):
 
         if sample_n > 1:
             eval_split_n(model, n_predictions, loader, [fc_feats, att_feats, att_masks, data], eval_kwargs)
-        
+        print(loader.frame2data[str(loader.iterator)])
         # ix0 = data['bounds']['it_pos_now']
         ix1 = data['bounds']['it_max']
         # if num_images != -1:
