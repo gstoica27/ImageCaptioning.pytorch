@@ -11,6 +11,7 @@ import torch
 import skimage
 import skimage.io
 import scipy.misc
+import sys
 
 from torchvision import transforms as trn
 import pickle
@@ -24,6 +25,7 @@ preprocess = trn.Compose([
 
 from ..utils.resnet_utils import myResnet
 from ..utils import resnet
+from ..super_resolution.model.common import resolve_single
 
 class DataLoaderRaw():
     
@@ -34,6 +36,8 @@ class DataLoaderRaw():
 
         self.batch_size = opt.get('batch_size', 1)
         self.seq_per_img = 1
+        # Pass Super Resolution model
+        self.sr_model = opt.get('sr_model', None)
 
         # Load resnet
         self.cnn_model = opt.get('cnn_model', 'resnet101')
@@ -120,6 +124,9 @@ class DataLoaderRaw():
             # cropped_img = deepcopy(img).crop(
             #     (roi_bbox[0], roi_bbox[1], roi_bbox[2]+1, roi_bbox[3]+1)
             # )
+            # Apply Super-Resolution to Image
+            if self.sr_model is not None:
+                cropped_img = resolve_single(self.sr_model, cropped_img)
 
             if len(cropped_img.shape) == 2:
                 cropped_img = cropped_img[:,:,np.newaxis]

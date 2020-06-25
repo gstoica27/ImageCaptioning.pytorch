@@ -17,6 +17,7 @@ import captioning.utils.eval_utils as eval_utils
 import argparse
 import captioning.utils.misc as utils
 import captioning.modules.losses as losses
+from captioning.super_resolution.model.srgan import generator
 import torch
 
 # Input arguments and options
@@ -34,6 +35,8 @@ parser.add_argument('--force', type=int, default=0,
                 help='force to evaluate no matter if there are results available')
 parser.add_argument('--all_captions_save_path', type=str, default='',
                 help="Path where to save all predicted dataset captions. '' means don't save.")
+parser.add_argument('--sr_path', type=str, default='',
+                    help="Path of super resolution model")
 opts.add_eval_options(parser)
 opts.add_diversity_opts(parser)
 opt = parser.parse_args()
@@ -70,6 +73,13 @@ model.cuda()
 model.eval()
 crit = losses.LanguageModelCriterion()
 
+if opt.sr_path != '':
+    sr_model = generator()
+    sr_model.load_weights(opt.sr_path)
+else:
+    sr_model = None
+opt.sr_model = sr_model
+
 # Create the Data Loader instance
 if len(opt.image_folder) == 0:
     loader = DataLoader(opt)
@@ -77,7 +87,9 @@ else:
     loader = DataLoaderRaw({'folder_path': opt.image_folder,
                             'coco_json': opt.coco_json,
                             'batch_size': opt.batch_size,
-                            'cnn_model': opt.cnn_model})
+                            'cnn_model': opt.cnn_model,
+                            'sr_model': opt.sr_model
+                            })
 # When eval using provided pretrained model, the vocab may be different from what you have in your cocotalk.json
 # So make sure to use the vocab in infos file.
 loader.dataset.ix_to_word = infos['vocab']
