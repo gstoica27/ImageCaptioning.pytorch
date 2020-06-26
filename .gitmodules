@@ -4,3 +4,7 @@
 [submodule "coco-caption"]
 	path = coco-caption
 	url = https://github.com/ruotianluo/coco-caption.git
+[submodule "super-resolution"]
+	path = super-resolution
+	url = https://github.com/gstoica27/super-resolution.git
+	branch = master
