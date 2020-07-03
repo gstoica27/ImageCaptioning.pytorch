@@ -123,7 +123,8 @@ class DataLoaderRaw():
             print('Image | Shape: {} | Max Val: {}'.format(img.shape, np.max(img)))
             print('ROI BBox: {}'.format(roi_bbox))
             # cropped_img = img[roi_bbox[1]:roi_bbox[3]+1, roi_bbox[0]:roi_bbox[2]+1, :]
-            cropped_img = img[roi_bbox[0]:roi_bbox[2]+1, roi_bbox[1]:roi_bbox[3]+1, :]
+            # cropped_img = img[roi_bbox[0]:roi_bbox[2]+1, roi_bbox[1]:roi_bbox[3]+1, :]
+            cropped_img = img
             # cropped_img = deepcopy(img).crop(
             #     (roi_bbox[0], roi_bbox[1], roi_bbox[2]+1, roi_bbox[3]+1)
             # )
