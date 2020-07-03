@@ -120,7 +120,8 @@ class DataLoaderRaw():
             # img = skimage.io.imread(self.files[ri])
 
             roi_bbox = frame_data['rois'][i].astype(np.int)
-            cropped_img = img[roi_bbox[1]:roi_bbox[3]+1, roi_bbox[0]:roi_bbox[2]+1, :]
+            # cropped_img = img[roi_bbox[1]:roi_bbox[3]+1, roi_bbox[0]:roi_bbox[2]+1, :]
+            cropped_img = img[roi_bbox[0]:roi_bbox[2]+1, roi_bbox[1]:roi_bbox[3]+1, :]
             # cropped_img = deepcopy(img).crop(
             #     (roi_bbox[0], roi_bbox[1], roi_bbox[2]+1, roi_bbox[3]+1)
             # )
