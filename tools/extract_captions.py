@@ -74,11 +74,15 @@ model.eval()
 crit = losses.LanguageModelCriterion()
 
 if opt.sr_path != '':
+    print('Using Super Resolution')
     sr_model = generator()
     sr_model.load_weights(opt.sr_path)
 else:
+    print('Not using Super Resolution')
     sr_model = None
 opt.sr_model = sr_model
+
+
 
 # Create the Data Loader instance
 if len(opt.image_folder) == 0:
