@@ -17,7 +17,7 @@ import captioning.utils.eval_utils as eval_utils
 import argparse
 import captioning.utils.misc as utils
 import captioning.modules.losses as losses
-from captioning.super_resolution.model.srgan import generator
+#from captioning.super_resolution.model.srgan import generator
 import torch
 
 # Input arguments and options
